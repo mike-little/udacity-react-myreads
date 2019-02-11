@@ -7,29 +7,31 @@ class SearchBooks extends React.Component {
 
     state = { searchString: '', searchResults: [], error: null}
 
-    performSearch = searchString => {
+     performSearch = searchString => {
         try {
             this.setState({searchString: searchString, error: null})
             if (!searchString) {
                 this.setState({searchResults: [], resultMsg: ''})
             } else {
                 BooksAPI.search(searchString).then(foundBooks => {
-                    if (foundBooks && !foundBooks.error) {
-                        let cleanResults = foundBooks.filter(function (book) {
-                            return book.imageLinks;
-                        })
-                        /* Maintain proper shelf between search page and main page */
-                        cleanResults.forEach(result => {
-                            result.shelf = 'none';
-                            this.props.books.forEach(existingBook =>{
-                                if (existingBook.id === result.id) {
-                                    result.shelf = existingBook.shelf;
-                                }
+                    if (searchString === this.state.searchString) {
+                        if (foundBooks && !foundBooks.error) {
+                            let cleanResults = foundBooks.filter(function (book) {
+                                return book.imageLinks;
                             })
-                        })
-                        this.setState({searchResults: cleanResults})
-                    } else {
-                        this.setState({searchResults: []})
+                            /* Maintain proper shelf between search page and main page */
+                            cleanResults.forEach(result => {
+                                result.shelf = 'none';
+                                this.props.books.forEach(existingBook => {
+                                    if (existingBook.id === result.id) {
+                                        result.shelf = existingBook.shelf;
+                                    }
+                                })
+                            })
+                            this.setState({searchResults: cleanResults})
+                        } else {
+                            this.setState({searchResults: []})
+                        }
                     }
                 })
             }
